@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TypeScript library plus optional Vue 3 components for the **Metanorma Mirror** document format — a JSON tree representation of standards documents (ISO-style: clauses, terms, tables, formulas, etc.). The library is framework-agnostic; the Vue layer is opt-in via a separate subpath export.
 
-Published as a dual-entry-point package:
-- `metanorma-mirror-js` — core types, traversal, mark registry, math rendering
-- `metanorma-mirror-js/vue` — `<MirrorNode>` / `<MirrorText>` components
+Published as a dual-entry-point package under the `@metanorma` scope:
+- `@metanorma/mirror` — core types, traversal, mark registry, math rendering
+- `@metanorma/mirror/vue` — `<MirrorNode>` / `<MirrorText>` components
+
+BSD-3-Clause (Ribose, 2026). Repo: `metanorma/metanorma-mirror-js`.
 
 ## Common commands
 
@@ -27,6 +29,14 @@ npx vitest run tests/traversal.test.ts -t "buildToc"
 ```
 
 Type declarations are emitted by `vite-plugin-dts` during `vite build` — the source `tsconfig.json` only drives editor typechecking. Source-level `tsc --noEmit` requires the Vue shim at `src/vue/shims-vue.d.ts` (already present) so `.vue` imports resolve; without it `src/vue/index.ts` errors with TS2307.
+
+## Release flow
+
+Releases are automated via `.github/workflows/release.yml`. Tag push of `v*` (e.g. `v0.1.0-beta.1`) triggers `npm publish --provenance --access public` and creates a GitHub release. Ad-hoc releases can be triggered via `workflow_dispatch` with a version input.
+
+Required secret: `NPM_TOKEN` — automation token from an npm account with publish rights to `@metanorma`. Set via `gh secret set NPM_TOKEN` or repo settings UI.
+
+CI runs on push/PR to main (`.github/workflows/ci.yml`) with a Node 20/22/24 matrix. Dependabot submits weekly PRs for npm and GitHub Actions updates.
 
 ## Architecture
 
