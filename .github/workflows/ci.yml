@@ -49,5 +49,10 @@ jobs:
         with:
           node-version: '24'
       - run: npm ci
-      - run: npx puppeteer browsers install chrome
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+      - run: |
+          chrome_path=$(readlink -f "$(which google-chrome || which google-chrome-stable)")
+          echo "Resolved Chrome at: $chrome_path"
+          echo "PUPPETEER_EXECUTABLE_PATH=$chrome_path" >> "$GITHUB_ENV"
       - run: npm run test:e2e
