@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { getNodeText, findNodes, buildToc } from '../src/traversal'
-import type { MirrorNode } from '../src/types'
+import type { MirrorMark, MirrorNode } from '../src/types'
 
-function textNode(text: string, marks?: any[]): MirrorNode {
+function textNode(text: string, marks?: MirrorMark[]): MirrorNode {
   return { type: 'text', text, marks }
 }
 

@@ -22,7 +22,6 @@ export async function renderFormula(node: MirrorNode): Promise<string> {
 
   if (asciimath) {
     try {
-      // @ts-ignore — optional dependency
       const { default: Plurimath } = await import('@plurimath/plurimath')
       const p = new Plurimath(asciimath, 'asciimath')
       return p.toMathml()
