@@ -32,11 +32,11 @@ Type declarations are emitted by `vite-plugin-dts` during `vite build` — the s
 
 ## Release flow
 
-Releases are automated via `.github/workflows/release.yml`. Tag push of `v*` (e.g. `v0.1.0-beta.1`) triggers `npm publish --provenance --access public` and creates a GitHub release. Ad-hoc releases can be triggered via `workflow_dispatch` with a version input.
+Releases are automated via `.github/workflows/release.yml`. Tag push of `v*` (e.g. `v0.1.0`) triggers `npm publish --provenance --access public --tag <dist-tag>` and creates a GitHub release. Ad-hoc releases can be triggered via `workflow_dispatch` with a version input. The dist-tag is derived from the version: prerelease identifiers become the dist-tag (`0.1.0-beta.1` → `beta`, `0.9.0-rc.2` → `rc`), full releases go to `latest`.
 
 Required secret: `NPM_TOKEN` — automation token from an npm account with publish rights to `@metanorma`. Set via `gh secret set NPM_TOKEN` or repo settings UI.
 
-CI runs on push/PR to main (`.github/workflows/ci.yml`) with a Node 20/22/24 matrix. Dependabot submits weekly PRs for npm and GitHub Actions updates.
+CI runs on push/PR to main (`.github/workflows/ci.yml`) with four jobs: `lint`, `build`, `test` (Node 20/22/24 matrix), and `test-e2e` (Puppeteer with the runner's system Chrome). Dependabot submits weekly PRs for npm and GitHub Actions updates.
 
 ## Architecture
 

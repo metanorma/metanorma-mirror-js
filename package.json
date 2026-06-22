@@ -1,6 +1,6 @@
 {
   "name": "@metanorma/mirror",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0",
   "description": "TypeScript library and Vue components for the Metanorma Mirror document format",
   "type": "module",
   "license": "BSD-3-Clause",
