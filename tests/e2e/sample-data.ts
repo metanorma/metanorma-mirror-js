@@ -105,6 +105,19 @@ export const sampleDocument: MirrorDocument = {
                 },
               ],
             },
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'text', text: 'The maximum permissible error is given by ' },
+              ],
+            },
+            {
+              type: 'formula',
+              attrs: {
+                mathml: '<math><mrow><mi>MPE</mi><mo>=</mo><mn>0.5</mn><mi>mg</mi></mrow></math>',
+                number: '1',
+              },
+            },
           ],
         },
         {

@@ -115,4 +115,14 @@ describe('Mirror component rendering', () => {
     const stem = await page.$eval('.mirror-stem', el => el.textContent)
     expect(stem).toBe('MPE')
   })
+
+  it('renders formula nodes via the formula accessor', async () => {
+    await page.goto(baseUrl, { waitUntil: 'networkidle0' })
+    const formula = await page.$('.mirror-formula')
+    expect(formula).not.toBeNull()
+    const math = await page.$eval('.mirror-formula-content math', el => el.outerHTML)
+    expect(math).toContain('<mi>MPE</mi>')
+    const number = await page.$eval('.mirror-formula-number', el => el.textContent?.trim())
+    expect(number).toBe('(1)')
+  })
 })
