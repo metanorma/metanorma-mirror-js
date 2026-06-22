@@ -57,8 +57,6 @@ jobs:
             npm version ${{ steps.version.outputs.version }} --no-git-tag-version
           fi
       - run: npm publish --provenance --access public --tag ${{ steps.version.outputs.dist-tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   github-release:
     needs: publish

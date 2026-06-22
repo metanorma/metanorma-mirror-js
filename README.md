@@ -121,12 +121,19 @@ Every node shares the shape `{ type, attrs?, content?, marks?, text? }`. Node ty
 ```bash
 npm install
 npm run build          # vite build → dist + .d.ts via vite-plugin-dts
+npm run lint           # eslint
 npm test               # vitest unit tests
 npm run test:e2e       # puppeteer e2e
 npm run test:all       # both suites
 ```
 
-Requires **Node.js 20+**. See [CONTRIBUTING.md](./CONTRIBUTING.md) for release flow and conventions.
+Requires **Node.js 20+**.
+
+### Releases
+
+Releases are automated through `.github/workflows/release.yml`. A `v*` tag push, or a `workflow_dispatch` run with a `version` input, runs `npm publish --provenance --access public --tag <dist-tag>` and creates a GitHub release. The dist-tag is derived from the version (`0.1.0` → `latest`, `0.1.0-beta.1` → `beta`, `0.9.0-rc.2` → `rc`).
+
+Publishing uses npm's [Trusted Publisher](https://docs.npmjs.com/generating-provenance-statements) (OIDC) — no `NPM_TOKEN` secret is required. The npm package lists this repository's `release.yml` workflow as a Trusted Publisher, and the workflow carries `permissions.id-token: write`, which is what npm's OIDC exchange needs.
 
 ## License
 
