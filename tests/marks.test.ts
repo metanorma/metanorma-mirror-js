@@ -20,6 +20,20 @@ describe('resolveMark', () => {
   it('returns undefined for unknown marks', () => {
     expect(resolveMark(mark('unknown'))).toBeUndefined()
   })
+
+  it('carries semantic class names for styled marks', () => {
+    expect(resolveMark(mark('footnote'))?.classes).toBe('mirror-footnote')
+    expect(resolveMark(mark('stem'))?.classes).toBe('mirror-stem')
+    expect(resolveMark(mark('concept'))?.classes).toBe('mirror-concept')
+    expect(resolveMark(mark('bcp14'))?.classes).toBe('mirror-bcp14')
+    expect(resolveMark(mark('eref'))?.classes).toBe('mirror-eref')
+    expect(resolveMark(mark('smallcap'))?.classes).toBe('mirror-smallcap')
+  })
+
+  it('leaves formatting marks without a class name', () => {
+    expect(resolveMark(mark('strong'))?.classes).toBeUndefined()
+    expect(resolveMark(mark('emphasis'))?.classes).toBeUndefined()
+  })
 })
 
 describe('resolveFirstMark', () => {
@@ -36,6 +50,24 @@ describe('resolveFirstMark', () => {
   it('returns null for empty or undefined marks', () => {
     expect(resolveFirstMark([])).toBeNull()
     expect(resolveFirstMark(undefined)).toBeNull()
+  })
+
+  it('prefers higher-priority marks regardless of list order', () => {
+    const result = resolveFirstMark([mark('strong'), mark('link', { target: 'x' })])
+    expect(result?.renderer.tag).toBe('a')
+  })
+
+  it('keeps the first mark when priorities tie', () => {
+    const result = resolveFirstMark([mark('strong'), mark('emphasis')])
+    expect(result?.renderer.tag).toBe('strong')
+    const reversed = resolveFirstMark([mark('emphasis'), mark('strong')])
+    expect(reversed?.renderer.tag).toBe('em')
+  })
+
+  it('prefers a footnote over a formatting mark', () => {
+    const result = resolveFirstMark([mark('strong'), mark('footnote')])
+    expect(result?.renderer.tag).toBe('sup')
+    expect(result?.renderer.classes).toBe('mirror-footnote')
   })
 })
 
