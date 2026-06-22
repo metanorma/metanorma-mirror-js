@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { MirrorNode as MirrorNodeType } from '../types'
 import { isSectionType } from '../types'
+import { extractFormulaAttrs } from '../math'
 import MirrorText from './MirrorText.vue'
 
 defineOptions({ name: 'MirrorNode' })
-defineProps<{ node: MirrorNodeType; depth?: number }>()
+const props = defineProps<{ node: MirrorNodeType; depth?: number }>()
 
 function headingTag(depth: number): string {
   return 'h' + Math.min(depth + 1, 6)
 }
+
+const formula = computed(() => (props.node.type === 'formula' ? extractFormulaAttrs(props.node) : null))
 </script>
 
 <template>
@@ -120,10 +124,9 @@ function headingTag(depth: number): string {
   <!-- Formula -->
   <div v-else-if="node.type === 'formula'" class="mirror-formula">
     <!-- eslint-disable-next-line vue/no-v-html -- MathML is trusted pre-computed output -->
-    <div v-if="node.attrs?.mathml" class="mirror-formula-content" v-html="node.attrs.mathml as string" />
-    <span v-else-if="node.attrs?.asciimath" class="mirror-formula-content">{{ node.attrs.asciimath }}</span>
-    <span v-else-if="node.attrs?.math_text" class="mirror-formula-content">{{ node.attrs.math_text }}</span>
-    <span v-if="node.attrs?.number" class="mirror-formula-number">({{ node.attrs.number }})</span>
+    <div v-if="formula?.mathml" class="mirror-formula-content" v-html="formula.mathml" />
+    <span v-else-if="formula?.asciimath" class="mirror-formula-content">{{ formula.asciimath }}</span>
+    <span v-if="formula?.number" class="mirror-formula-number">({{ formula.number }})</span>
   </div>
 
   <!-- Sourcecode -->
