@@ -1,7 +1,5 @@
 import type { MirrorNode } from './types'
-import { SECTION_TYPES } from './types'
-
-const sectionTypeSet = new Set<string>(SECTION_TYPES)
+import { isSectionType } from './types'
 
 export function getNodeText(node: MirrorNode): string {
   if (node.text) return node.text
@@ -12,15 +10,23 @@ export function getNodeText(node: MirrorNode): string {
 export function findNodes(
   node: MirrorNode,
   predicate: (n: MirrorNode) => boolean,
-  results: MirrorNode[] = [],
 ): MirrorNode[] {
+  const results: MirrorNode[] = []
+  walkForFind(node, predicate, results)
+  return results
+}
+
+function walkForFind(
+  node: MirrorNode,
+  predicate: (n: MirrorNode) => boolean,
+  results: MirrorNode[],
+): void {
   if (predicate(node)) results.push(node)
   if (node.content) {
     for (const child of node.content) {
-      findNodes(child, predicate, results)
+      walkForFind(child, predicate, results)
     }
   }
-  return results
 }
 
 export interface TocEntry {
@@ -36,7 +42,7 @@ export function buildToc(root: MirrorNode): TocEntry[] {
 }
 
 function walkForToc(node: MirrorNode, depth: number, entries: TocEntry[]): void {
-  if (isTocSection(node) && node.attrs?.title && node.attrs?.id) {
+  if (isSectionType(node.type) && node.attrs?.title && node.attrs?.id) {
     const number = node.attrs.number ? `${node.attrs.number} ` : ''
     entries.push({
       id: node.attrs.id as string,
@@ -55,8 +61,4 @@ function walkForToc(node: MirrorNode, depth: number, entries: TocEntry[]): void 
       walkForToc(child, depth, entries)
     }
   }
-}
-
-function isTocSection(node: MirrorNode): boolean {
-  return sectionTypeSet.has(node.type)
 }

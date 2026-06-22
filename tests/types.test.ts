@@ -7,6 +7,17 @@ import {
   LIST_TYPES,
   TABLE_TYPES,
   MEDIA_TYPES,
+  isMarkType,
+  isStructuralType,
+  isSectionType,
+  isBlockType,
+  isListType,
+  isTableType,
+  isMediaType,
+  isFootnoteType,
+  isLeafType,
+  isTextNode,
+  type MirrorNode,
 } from '../src/types'
 
 describe('MARK_TYPES', () => {
@@ -59,5 +70,53 @@ describe('MEDIA_TYPES', () => {
   it('figure is in MEDIA_TYPES not BLOCK_TYPES', () => {
     expect(MEDIA_TYPES).toContain('figure')
     expect(BLOCK_TYPES).not.toContain('figure')
+  })
+})
+
+describe('all type categories have disjoint predicates', () => {
+  it.each([
+    ['clause', isSectionType],
+    ['annex', isSectionType],
+    ['doc', isStructuralType],
+    ['preface', isStructuralType],
+    ['paragraph', isBlockType],
+    ['bullet_list', isListType],
+    ['table', isTableType],
+    ['figure', isMediaType],
+    ['footnotes', isFootnoteType],
+    ['text', isLeafType],
+  ] as const)('identifies %s via its category predicate', (type, predicate) => {
+    expect(predicate(type)).toBe(true)
+  })
+
+  it('a section type does not satisfy other category predicates', () => {
+    expect(isSectionType('clause')).toBe(true)
+    expect(isBlockType('clause')).toBe(false)
+    expect(isStructuralType('clause')).toBe(false)
+  })
+
+  it('unknown types satisfy no category predicate', () => {
+    const unknown = 'no_such_type'
+    for (const predicate of [isMarkType, isStructuralType, isSectionType, isBlockType, isListType, isTableType, isMediaType, isFootnoteType, isLeafType]) {
+      expect(predicate(unknown)).toBe(false)
+    }
+  })
+
+  it('mark types are distinguishable from node types', () => {
+    expect(isMarkType('emphasis')).toBe(true)
+    expect(isMarkType('clause')).toBe(false)
+    expect(isSectionType('emphasis')).toBe(false)
+  })
+})
+
+describe('isTextNode', () => {
+  it('returns true for a text node', () => {
+    const node: MirrorNode = { type: 'text', text: 'hi' }
+    expect(isTextNode(node)).toBe(true)
+  })
+
+  it('returns false for non-text nodes', () => {
+    expect(isTextNode({ type: 'paragraph', content: [] })).toBe(false)
+    expect(isTextNode({ type: 'soft_break' })).toBe(false)
   })
 })
