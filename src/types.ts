@@ -44,6 +44,25 @@ export interface MirrorNode {
   text?: string
 }
 
+function makeTypePredicate<T extends string>(values: readonly T[]) {
+  const set: ReadonlySet<string> = new Set(values)
+  return (type: string): type is T => set.has(type)
+}
+
+export const isMarkType = makeTypePredicate(MARK_TYPES)
+export const isStructuralType = makeTypePredicate(STRUCTURAL_TYPES)
+export const isSectionType = makeTypePredicate(SECTION_TYPES)
+export const isBlockType = makeTypePredicate(BLOCK_TYPES)
+export const isListType = makeTypePredicate(LIST_TYPES)
+export const isTableType = makeTypePredicate(TABLE_TYPES)
+export const isMediaType = makeTypePredicate(MEDIA_TYPES)
+export const isFootnoteType = makeTypePredicate(FOOTNOTE_TYPES)
+export const isLeafType = makeTypePredicate(LEAF_TYPES)
+
+export function isTextNode(node: MirrorNode): boolean {
+  return node.type === 'text'
+}
+
 export type MirrorDocument = MirrorNode
 
 export interface DocumentPart {

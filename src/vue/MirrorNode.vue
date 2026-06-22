@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MirrorNode as MirrorNodeType } from '../types'
+import { isSectionType } from '../types'
 import MirrorText from './MirrorText.vue'
 
 defineOptions({ name: 'MirrorNode' })
@@ -33,7 +34,7 @@ function headingTag(depth: number): string {
   </div>
 
   <!-- Sections -->
-  <section v-else-if="'clause annex content_section abstract foreword introduction acknowledgements terms definitions references'.split(' ').includes(node.type)" :id="(node.attrs?.id as string) || undefined" class="mirror-section" :class="'mirror-' + node.type">
+  <section v-else-if="isSectionType(node.type)" :id="(node.attrs?.id as string) || undefined" class="mirror-section" :class="'mirror-' + node.type">
     <component :is="headingTag(depth ?? 1)" v-if="node.attrs?.title" class="mirror-heading">
       <span v-if="node.attrs?.number" class="mirror-number">{{ node.attrs.number }}&nbsp;</span>{{ node.attrs.title }}
     </component>
