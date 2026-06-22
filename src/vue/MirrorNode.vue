@@ -33,7 +33,7 @@ function headingTag(depth: number): string {
   </div>
 
   <!-- Sections -->
-  <section v-else-if="'clause annex content_section abstract foreword introduction acknowledgements terms definitions references'.split(' ').includes(node.type)" class="mirror-section" :class="'mirror-' + node.type" :id="(node.attrs?.id as string) || undefined">
+  <section v-else-if="'clause annex content_section abstract foreword introduction acknowledgements terms definitions references'.split(' ').includes(node.type)" :id="(node.attrs?.id as string) || undefined" class="mirror-section" :class="'mirror-' + node.type">
     <component :is="headingTag(depth ?? 1)" v-if="node.attrs?.title" class="mirror-heading">
       <span v-if="node.attrs?.number" class="mirror-number">{{ node.attrs.number }}&nbsp;</span>{{ node.attrs.title }}
     </component>
@@ -84,7 +84,7 @@ function headingTag(depth: number): string {
 
   <!-- Image -->
   <div v-else-if="node.type === 'image'" class="mirror-image">
-    <img v-if="node.attrs?.src" :src="node.attrs.src as string" :alt="(node.attrs?.alt as string) || ''" />
+    <img v-if="node.attrs?.src" :src="node.attrs.src as string" :alt="(node.attrs?.alt as string) || ''">
   </div>
 
   <!-- Table -->
@@ -118,6 +118,7 @@ function headingTag(depth: number): string {
 
   <!-- Formula -->
   <div v-else-if="node.type === 'formula'" class="mirror-formula">
+    <!-- eslint-disable-next-line vue/no-v-html -- MathML is trusted pre-computed output -->
     <div v-if="node.attrs?.mathml" class="mirror-formula-content" v-html="node.attrs.mathml as string" />
     <span v-else-if="node.attrs?.asciimath" class="mirror-formula-content">{{ node.attrs.asciimath }}</span>
     <span v-else-if="node.attrs?.math_text" class="mirror-formula-content">{{ node.attrs.math_text }}</span>
@@ -159,7 +160,7 @@ function headingTag(depth: number): string {
   <component :is="headingTag((depth ?? 2) + 1)" v-else-if="node.type === 'floating_title'" class="mirror-floating-title">{{ node.attrs?.title }}</component>
 
   <!-- Soft break -->
-  <br v-else-if="node.type === 'soft_break'" />
+  <br v-else-if="node.type === 'soft_break'">
 
   <!-- Fallback: render children -->
   <div v-else-if="node.content?.length" :class="'mirror-' + node.type">
