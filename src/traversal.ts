@@ -1,5 +1,5 @@
 import type { MirrorNode } from './types'
-import { isSectionType } from './types'
+import { hasSectionType } from './types'
 
 export function getNodeText(node: MirrorNode): string {
   if (node.text) return node.text
@@ -42,19 +42,22 @@ export function buildToc(root: MirrorNode): TocEntry[] {
 }
 
 function walkForToc(node: MirrorNode, depth: number, entries: TocEntry[]): void {
-  if (isSectionType(node.type) && node.attrs?.title && node.attrs?.id) {
-    const number = node.attrs.number ? `${node.attrs.number} ` : ''
-    entries.push({
-      id: node.attrs.id as string,
-      title: `${number}${node.attrs.title}`,
-      depth,
-    })
-    if (node.content) {
-      for (const child of node.content) {
-        walkForToc(child, depth + 1, entries)
+  if (hasSectionType(node)) {
+    const attrs = node.attrs
+    if (attrs?.title && attrs.id) {
+      const number = attrs.number ? `${attrs.number} ` : ''
+      entries.push({
+        id: attrs.id,
+        title: `${number}${attrs.title}`,
+        depth,
+      })
+      if (node.content) {
+        for (const child of node.content) {
+          walkForToc(child, depth + 1, entries)
+        }
       }
+      return
     }
-    return
   }
   if (node.content) {
     for (const child of node.content) {

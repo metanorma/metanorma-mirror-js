@@ -33,6 +33,18 @@ describe('extractFormulaAttrs', () => {
     const result = extractFormulaAttrs(node)
     expect(result).toEqual({ mathml: null, asciimath: null, number: null })
   })
+
+  it('returns null fields for non-formula nodes', () => {
+    const node: MirrorNode = { type: 'paragraph', content: [] }
+    const result = extractFormulaAttrs(node)
+    expect(result).toEqual({ mathml: null, asciimath: null, number: null })
+  })
+
+  it('coerces empty mathml string to null', () => {
+    const node = formulaNode({ mathml: '' })
+    const result = extractFormulaAttrs(node)
+    expect(result.mathml).toBeNull()
+  })
 })
 
 describe('renderFormula', () => {
