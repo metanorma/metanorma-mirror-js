@@ -6,6 +6,94 @@ export const MARK_TYPES = [
 
 export type MirrorMarkType = typeof MARK_TYPES[number]
 
+export interface BaseAttrs {
+  id?: string
+  number?: string
+  [key: string]: unknown
+}
+
+export interface SectionAttrs extends BaseAttrs {
+  title?: string
+}
+
+export interface FigureAttrs extends BaseAttrs {
+  title?: string
+  src?: string
+  alt?: string
+}
+
+export interface TableAttrs extends BaseAttrs {
+  title?: string
+}
+
+export interface TableCellAttrs {
+  colspan?: number
+  rowspan?: number
+  [key: string]: unknown
+}
+
+export interface FormulaAttrs {
+  asciimath?: string
+  mathml?: string
+  math_text?: string
+  number?: string
+  [key: string]: unknown
+}
+
+export interface ImageAttrs {
+  src: string
+  alt?: string
+  [key: string]: unknown
+}
+
+export interface AdmonitionAttrs {
+  type?: string
+  [key: string]: unknown
+}
+
+export interface SourcecodeAttrs {
+  text?: string
+  language?: string
+  [key: string]: unknown
+}
+
+export interface LinkMarkAttrs {
+  target?: string
+  href?: string
+  [key: string]: unknown
+}
+
+export interface XrefMarkAttrs {
+  target?: string
+  [key: string]: unknown
+}
+
+export interface NodeAttrsByType {
+  clause: SectionAttrs
+  annex: SectionAttrs
+  content_section: SectionAttrs
+  abstract: SectionAttrs
+  foreword: SectionAttrs
+  introduction: SectionAttrs
+  acknowledgements: SectionAttrs
+  terms: SectionAttrs
+  definitions: SectionAttrs
+  references: SectionAttrs
+  floating_title: SectionAttrs
+  formula: FormulaAttrs
+  figure: FigureAttrs
+  table: TableAttrs
+  table_cell: TableCellAttrs
+  image: ImageAttrs
+  admonition: AdmonitionAttrs
+  sourcecode: SourcecodeAttrs
+}
+
+export interface MarkAttrsByType {
+  link: LinkMarkAttrs
+  xref: XrefMarkAttrs
+}
+
 export interface MirrorMark {
   type: MirrorMarkType
   attrs?: Record<string, unknown>
@@ -42,6 +130,38 @@ export interface MirrorNode {
   content?: MirrorNode[]
   marks?: MirrorMark[]
   text?: string
+}
+
+export type AttrsFor<T extends string> =
+  T extends keyof NodeAttrsByType ? NodeAttrsByType[T] : Record<string, unknown>
+
+export type TypedMirrorNode<T extends MirrorNodeType> =
+  Omit<MirrorNode, 'type' | 'attrs'> & { type: T; attrs?: AttrsFor<T> }
+
+export type ClauseNode = TypedMirrorNode<'clause'>
+export type AnnexNode = TypedMirrorNode<'annex'>
+export type ContentSectionNode = TypedMirrorNode<'content_section'>
+export type AbstractNode = TypedMirrorNode<'abstract'>
+export type ForewordNode = TypedMirrorNode<'foreword'>
+export type IntroductionNode = TypedMirrorNode<'introduction'>
+export type AcknowledgementsNode = TypedMirrorNode<'acknowledgements'>
+export type TermsNode = TypedMirrorNode<'terms'>
+export type DefinitionsNode = TypedMirrorNode<'definitions'>
+export type ReferencesNode = TypedMirrorNode<'references'>
+export type FloatingTitleNode = TypedMirrorNode<'floating_title'>
+export type FormulaNode = TypedMirrorNode<'formula'>
+export type FigureNode = TypedMirrorNode<'figure'>
+export type TableNode = TypedMirrorNode<'table'>
+export type TableCellNode = TypedMirrorNode<'table_cell'>
+export type ImageNode = TypedMirrorNode<'image'>
+export type AdmonitionNode = TypedMirrorNode<'admonition'>
+export type SourcecodeNode = TypedMirrorNode<'sourcecode'>
+
+export function hasType<T extends MirrorNodeType>(
+  node: MirrorNode,
+  type: T,
+): node is TypedMirrorNode<T> {
+  return node.type === type
 }
 
 function makeTypePredicate<T extends string>(values: readonly T[]) {
