@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, expectTypeOf } from 'vitest'
 import {
   MARK_TYPES,
   STRUCTURAL_TYPES,
@@ -7,6 +7,8 @@ import {
   LIST_TYPES,
   TABLE_TYPES,
   MEDIA_TYPES,
+  FOOTNOTE_TYPES,
+  LEAF_TYPES,
   isMarkType,
   isStructuralType,
   isSectionType,
@@ -17,7 +19,11 @@ import {
   isFootnoteType,
   isLeafType,
   isTextNode,
+  hasType,
   type MirrorNode,
+  type ClauseNode,
+  type FormulaNode,
+  type FormulaAttrs,
 } from '../src/types'
 
 describe('MARK_TYPES', () => {
@@ -34,10 +40,30 @@ describe('MARK_TYPES', () => {
 })
 
 describe('type categories are disjoint', () => {
-  it('structural, section, block, list, table types have no overlap', () => {
-    const all = [...STRUCTURAL_TYPES, ...SECTION_TYPES, ...BLOCK_TYPES, ...LIST_TYPES, ...TABLE_TYPES]
+  it('every node type appears in exactly one category array', () => {
+    const all = [
+      ...STRUCTURAL_TYPES,
+      ...SECTION_TYPES,
+      ...BLOCK_TYPES,
+      ...LIST_TYPES,
+      ...TABLE_TYPES,
+      ...MEDIA_TYPES,
+      ...FOOTNOTE_TYPES,
+      ...LEAF_TYPES,
+    ]
     const unique = new Set(all)
     expect(unique.size).toBe(all.length)
+  })
+
+  it('MARK_TYPES shares no type with any node category', () => {
+    const nodeTypes = new Set<string>([
+      ...STRUCTURAL_TYPES, ...SECTION_TYPES, ...BLOCK_TYPES,
+      ...LIST_TYPES, ...TABLE_TYPES, ...MEDIA_TYPES,
+      ...FOOTNOTE_TYPES, ...LEAF_TYPES,
+    ])
+    for (const mark of MARK_TYPES) {
+      expect(nodeTypes.has(mark)).toBe(false)
+    }
   })
 })
 
@@ -118,5 +144,39 @@ describe('isTextNode', () => {
   it('returns false for non-text nodes', () => {
     expect(isTextNode({ type: 'paragraph', content: [] })).toBe(false)
     expect(isTextNode({ type: 'soft_break' })).toBe(false)
+  })
+})
+
+describe('hasType', () => {
+  it('narrows to the matching typed node alias', () => {
+    const node: MirrorNode = { type: 'clause', attrs: { id: 's1', title: 'Scope' } }
+    if (hasType(node, 'clause')) {
+      expectTypeOf(node).toMatchTypeOf<ClauseNode>()
+      expectTypeOf(node.attrs).toEqualTypeOf<{ id?: string; number?: string; title?: string } | undefined>()
+      expect(node.attrs?.title).toBe('Scope')
+    } else {
+      throw new Error('expected clause to be narrowed')
+    }
+  })
+
+  it('narrows formula nodes to typed formula attrs', () => {
+    const node: MirrorNode = { type: 'formula', attrs: { asciimath: 'x^2' } }
+    if (hasType(node, 'formula')) {
+      expectTypeOf(node).toMatchTypeOf<FormulaNode>()
+      expectTypeOf(node.attrs).toEqualTypeOf<FormulaAttrs | undefined>()
+      expect(node.attrs?.asciimath).toBe('x^2')
+    } else {
+      throw new Error('expected formula to be narrowed')
+    }
+  })
+
+  it('returns false when types do not match', () => {
+    const node: MirrorNode = { type: 'paragraph', content: [] }
+    expect(hasType(node, 'clause')).toBe(false)
+  })
+
+  it('returns true when types match', () => {
+    const node: MirrorNode = { type: 'paragraph', content: [] }
+    expect(hasType(node, 'paragraph')).toBe(true)
   })
 })
