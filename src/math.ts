@@ -1,4 +1,4 @@
-import type { MirrorNode } from './types'
+import { hasType, type MirrorNode } from './types'
 
 export interface FormulaDisplay {
   mathml: string | null
@@ -7,11 +7,14 @@ export interface FormulaDisplay {
 }
 
 export function extractFormulaAttrs(node: MirrorNode): FormulaDisplay {
-  const attrs = node.attrs ?? {}
+  if (!hasType(node, 'formula')) {
+    return { mathml: null, asciimath: null, number: null }
+  }
+  const attrs = node.attrs
   return {
-    mathml: (attrs.mathml as string) || null,
-    asciimath: (attrs.asciimath as string) || (attrs.math_text as string) || null,
-    number: (attrs.number as string) || null,
+    mathml: attrs?.mathml || null,
+    asciimath: attrs?.asciimath || attrs?.math_text || null,
+    number: attrs?.number || null,
   }
 }
 

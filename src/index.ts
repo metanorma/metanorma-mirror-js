@@ -11,6 +11,7 @@ export type {
   IntroductionNode, AcknowledgementsNode, TermsNode, DefinitionsNode,
   ReferencesNode, FloatingTitleNode, FormulaNode, FigureNode, TableNode,
   TableCellNode, ImageNode, AdmonitionNode, SourcecodeNode,
+  SectionNode,
 } from './types'
 
 export {
@@ -18,7 +19,7 @@ export {
   LIST_TYPES, TABLE_TYPES, MEDIA_TYPES, FOOTNOTE_TYPES, LEAF_TYPES,
   isMarkType, isStructuralType, isSectionType, isBlockType,
   isListType, isTableType, isMediaType, isFootnoteType, isLeafType,
-  isTextNode, hasType,
+  isTextNode, hasType, hasSectionType,
 } from './types'
 
 export { getNodeText, findNodes, buildToc, type TocEntry } from './traversal'

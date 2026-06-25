@@ -21,12 +21,20 @@ const PRIORITY_FORMAT = 10
 register('link', {
   tag: 'a',
   priority: PRIORITY_LINK,
-  extractHref: m => (m.attrs?.target as string) || (m.attrs?.href as string),
+  extractHref: m => {
+    const target = m.attrs?.target
+    if (typeof target === 'string') return target
+    const href = m.attrs?.href
+    return typeof href === 'string' ? href : undefined
+  },
 })
 register('xref', {
   tag: 'a',
   priority: PRIORITY_LINK,
-  extractHref: m => m.attrs?.target as string,
+  extractHref: m => {
+    const target = m.attrs?.target
+    return typeof target === 'string' ? target : undefined
+  },
 })
 
 register('footnote', { tag: 'sup', priority: PRIORITY_REFERENCE, classes: 'mirror-footnote' })

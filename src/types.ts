@@ -157,11 +157,17 @@ export type ImageNode = TypedMirrorNode<'image'>
 export type AdmonitionNode = TypedMirrorNode<'admonition'>
 export type SourcecodeNode = TypedMirrorNode<'sourcecode'>
 
+export type SectionNode = TypedMirrorNode<typeof SECTION_TYPES[number]>
+
 export function hasType<T extends MirrorNodeType>(
   node: MirrorNode,
   type: T,
 ): node is TypedMirrorNode<T> {
   return node.type === type
+}
+
+export function hasSectionType(node: MirrorNode): node is SectionNode {
+  return isSectionType(node.type)
 }
 
 function makeTypePredicate<T extends string>(values: readonly T[]) {

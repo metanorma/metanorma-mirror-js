@@ -82,6 +82,24 @@ describe('getMarkHref', () => {
       .toBe('mailto:test@example.com')
   })
 
+  it('prefers target over href when both are present', () => {
+    expect(getMarkHref(mark('link', { target: 'https://target.example', href: 'https://href.example' })))
+      .toBe('https://target.example')
+  })
+
+  it('returns undefined when link target is a non-string value', () => {
+    expect(getMarkHref(mark('link', { target: 42 }))).toBeUndefined()
+    expect(getMarkHref(mark('link', { href: { url: 'x' } }))).toBeUndefined()
+  })
+
+  it('extracts href from xref mark via target attr', () => {
+    expect(getMarkHref(mark('xref', { target: 'section-2' }))).toBe('section-2')
+  })
+
+  it('returns undefined when xref target is a non-string value', () => {
+    expect(getMarkHref(mark('xref', { target: 42 }))).toBeUndefined()
+  })
+
   it('returns undefined for marks without href extraction', () => {
     expect(getMarkHref(mark('strong'))).toBeUndefined()
   })
