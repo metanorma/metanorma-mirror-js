@@ -63,7 +63,8 @@ The split mirrors the categories from `src/types.ts` plus a few practical groupi
 | `StructuralRenderer`         | `preface`, `sections`, `bibliography`                                                |
 | `SectionRenderer`            | all `SECTION_TYPES` (clause, annex, terms, definitions, references, …)               |
 | `ParagraphRenderer`          | `paragraph`                                                                          |
-| `BlockRenderer`              | `note`, `example`, `review`, `admonition` (div with optional label + content)        |
+| `BlockRenderer`              | `note`, `example`, `review` (div with fixed label + content)                         |
+| `AdmonitionRenderer`         | `admonition` (variable type label from `attrs.type`)                                 |
 | `QuoteRenderer`              | `quote` (blockquote)                                                                 |
 | `FigureRenderer`             | `figure` (with caption)                                                              |
 | `ImageRenderer`              | `image` (img)                                                                        |
@@ -76,13 +77,12 @@ The split mirrors the categories from `src/types.ts` plus a few practical groupi
 | `ListRenderer`               | `bullet_list` → ul, `ordered_list` → ol                                              |
 | `ListItemRenderer`           | `list_item` → li                                                                     |
 | `DefinitionListRenderer`     | `dl` → dl, `dt` → dt, `dd` → dd                                                      |
-| `FootnoteRenderer`           | `footnotes`, `footnote_entry`                                                        |
+| `FootnoteRenderer`           | `footnotes`, `footnote_entry`, `footnote_marker`                                     |
 | `FloatingTitleRenderer`      | `floating_title` (dynamic heading level)                                             |
 | `LeafRenderer`               | `soft_break` → br                                                                    |
 | `TextNodeRenderer`           | `text` (delegates to `<MirrorText>`)                                                 |
-| `FallbackRenderer`           | any unregistered type with content (div + recurse)                                   |
 
-22 renderer components. Granularity is per the original plan (one renderer per category, switches internally for closely-related types).
+22 renderer components. Granularity is per the original plan (one renderer per category, switches internally for closely-related types). Unknown types fall through to an inline `<div class="mirror-${type}">` block in the dispatcher (preserves the prior fallback behavior).
 
 ### Registration
 
