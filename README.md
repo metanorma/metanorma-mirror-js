@@ -86,6 +86,8 @@ import { renderFormula } from '@metanorma/mirror'
 await renderFormula({ type: 'formula', attrs: { asciimath: 'E = mc^2' } })
 ```
 
+When rendered through `<MirrorNode>`, formula nodes are piped through `renderFormula` automatically — pre-computed `mathml` short-circuits, and asciimath auto-converts to MathML when `@plurimath/plurimath` is installed.
+
 ## Vue usage
 
 ```vue
