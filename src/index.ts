@@ -26,4 +26,4 @@ export { getNodeText, findNodes, buildToc, type TocEntry } from './traversal'
 
 export { resolveMark, resolveFirstMark, getMarkHref, registerMark, type MarkRenderer } from './marks'
 
-export { extractFormulaAttrs, renderFormula, type FormulaDisplay } from './math'
+export { renderFormula, type FormulaDisplay } from './math'
