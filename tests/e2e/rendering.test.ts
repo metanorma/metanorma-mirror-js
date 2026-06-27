@@ -33,7 +33,7 @@ describe('Mirror component rendering', () => {
   afterAll(async () => {
     await browser?.close()
     await server?.close()
-  })
+  }, 30_000)
 
   it('mounts the test app without errors', async () => {
     const errors: string[] = []
@@ -117,13 +117,27 @@ describe('Mirror component rendering', () => {
     expect(stem).toBe('MPE')
   })
 
-  it('renders formula nodes via the formula accessor', async () => {
+  it('renders pre-computed formula via the formula accessor', async () => {
     await page.goto(baseUrl, { waitUntil: 'networkidle0' })
-    const formula = await page.$('.mirror-formula')
+    const formula = await page.$('#tables .mirror-formula .mirror-formula-content math')
     expect(formula).not.toBeNull()
-    const math = await page.$eval('.mirror-formula-content math', el => el.outerHTML)
+    const math = await page.$eval('#tables .mirror-formula .mirror-formula-content math', el => el.outerHTML)
     expect(math).toContain('<mi>MPE</mi>')
-    const number = await page.$eval('.mirror-formula-number', el => el.textContent?.trim())
+    const number = await page.$eval('#tables .mirror-formula-number', el => el.textContent?.trim())
     expect(number).toBe('(1)')
+  })
+
+  it('converts asciimath formulas to MathML', async () => {
+    await page.goto(baseUrl, { waitUntil: 'networkidle0' })
+    await page.waitForFunction(
+      () => document.querySelectorAll('#tables .mirror-formula-content math').length >= 2,
+      { timeout: 10_000 },
+    )
+    const formulas = await page.$$eval('#tables .mirror-formula', els =>
+      els.map(e => e.querySelector('.mirror-formula-content math')?.outerHTML ?? '')
+    )
+    expect(formulas.length).toBe(2)
+    expect(formulas[0]).toContain('<mi>MPE</mi>')
+    expect(formulas[1]).toMatch(/<math[\s>]/)
   })
 })

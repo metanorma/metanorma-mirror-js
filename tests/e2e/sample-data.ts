@@ -118,6 +118,13 @@ export const sampleDocument: MirrorDocument = {
                 number: '1',
               },
             },
+            {
+              type: 'formula',
+              attrs: {
+                asciimath: 'a^2 + b^2 = c^2',
+                number: '2',
+              },
+            },
           ],
         },
         {
