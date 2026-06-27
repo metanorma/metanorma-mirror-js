@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { extractFormulaAttrs, renderFormula } from '../src/math'
 import type { MirrorNode } from '../src/types'
 
@@ -47,6 +47,15 @@ describe('extractFormulaAttrs', () => {
   })
 })
 
+vi.mock('@plurimath/plurimath', () => ({
+  default: class MockPlurimath {
+    constructor(private input: string, private _fmt: string) {}
+    toMathml(): string {
+      return `<math data-source="${this.input}"><mi>x</mi></math>`
+    }
+  },
+}))
+
 describe('renderFormula', () => {
   it('returns mathml directly when available', async () => {
     const node = formulaNode({
@@ -57,17 +66,33 @@ describe('renderFormula', () => {
     expect(result).toBe('<math><mi>x</mi></math>')
   })
 
-  it('returns asciimath string when plurimath is unavailable', async () => {
-    const node = formulaNode({ asciimath: 'n <= n_{"LC"}' })
+  it('converts asciimath to MathML via plurimath', async () => {
+    const node = formulaNode({ asciimath: 'a^2 + b^2 = c^2' })
     const result = await renderFormula(node)
-    // Either MathML (if plurimath loaded) or raw asciimath fallback
-    expect(typeof result).toBe('string')
-    expect(result.length).toBeGreaterThan(0)
+    expect(result).toMatch(/<math[\s>]/)
+    expect(result).toContain('data-source="a^2 + b^2 = c^2"')
   })
 
   it('returns empty string when no math content', async () => {
     const node: MirrorNode = { type: 'formula' }
     const result = await renderFormula(node)
     expect(result).toBe('')
+  })
+
+  it('falls back to raw asciimath when plurimath throws', async () => {
+    vi.doMock('@plurimath/plurimath', () => ({
+      default: class {
+        constructor(_input: string, _fmt: string) {
+          throw new Error('plurimath unavailable')
+        }
+      },
+    }))
+    vi.resetModules()
+    const { renderFormula: fallbackRender } = await import('../src/math')
+    const node = formulaNode({ asciimath: 'a^2' })
+    const result = await fallbackRender(node)
+    expect(result).toBe('a^2')
+    vi.doUnmock('@plurimath/plurimath')
+    vi.resetModules()
   })
 })
